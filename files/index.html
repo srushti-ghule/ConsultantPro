@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>ConsultPro — World-Class Expert Consultations</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<!-- PARTICLE CANVAS -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- ══════════ NAVBAR ══════════ -->
+<nav class="navbar navbar-expand-lg" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand" href="#">Consult<span class="pro">Pro</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nm">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nm">
+      <ul class="navbar-nav ms-auto align-items-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="#experts">Experts</a></li>
+        <li class="nav-item"><a class="nav-link" href="#how">Process</a></li>
+        <li class="nav-item"><a class="nav-link" href="#pricing">Pricing</a></li>
+        <li class="nav-item ms-2"><button class="btn btn-outline-gold btn-sm" onclick="showAuth('login')">Sign In</button></li>
+        <li class="nav-item ms-1"><button class="btn btn-gold btn-sm" onclick="showAuth('register')">Get Started</button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════ AUTH MODAL ══════════ -->
+<div class="modal fade" id="authModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content auth-glass" style="position:relative">
+      <div class="auth-aura"></div>
+      <div class="modal-header border-0 pb-0 px-4 pt-4">
+        <div class="auth-tabs w-100 me-3">
+          <button class="a-tab active" id="loginTab" onclick="switchTab('login')">Sign In</button>
+          <button class="a-tab" id="registerTab" onclick="switchTab('register')">Create Account</button>
+        </div>
+        <button type="button" class="btn-close btn-close-white flex-shrink-0" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body px-4 pb-4 pt-3">
+
+        <!-- LOGIN -->
+        <div id="loginForm">
+          <h4 class="auth-title">Welcome Back</h4>
+          <p class="auth-sub">Sign in to your ConsultPro account</p>
+          <div class="mb-3">
+            <label class="cp-label">Email Address</label>
+            <input type="email" class="cp-field" id="lEmail" placeholder="you@example.com"/>
+          </div>
+          <div class="mb-3">
+            <label class="cp-label">Password</label>
+            <div class="input-group">
+              <input type="password" class="cp-field" id="lPwd" placeholder="Enter your password" style="border-radius:12px 0 0 12px!important"/>
+              <button class="btn eye-btn" onclick="togglePwd('lPwd',this)"><i class="bi bi-eye"></i></button>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="remMe"/>
+              <label class="form-check-label" style="font-size:.82rem;color:var(--ink2)" for="remMe">Remember me</label>
+            </div>
+            <a href="#" style="color:var(--gold);text-decoration:none;font-size:.82rem">Forgot password?</a>
+          </div>
+          <div id="lErr" class="alert alert-danger py-2 d-none" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:10px;font-size:.82rem"></div>
+          <button class="btn btn-gold w-100 py-3 mb-3" onclick="handleLogin()">Sign In to ConsultPro</button>
+          <div class="auth-divider"><span>or continue with</span></div>
+          <div class="d-flex gap-2">
+            <button class="soc-btn"><i class="bi bi-google"></i> Google</button>
+            <button class="soc-btn"><i class="bi bi-linkedin"></i> LinkedIn</button>
+          </div>
+        </div>
+
+        <!-- REGISTER -->
+        <div id="registerForm" style="display:none">
+          <h4 class="auth-title">Create Your Account</h4>
+          <p class="auth-sub">Join 50,000+ users on ConsultPro</p>
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="cp-label">First Name</label>
+              <input type="text" class="cp-field" id="rFirst" placeholder="Full"/>
+            </div>
+            <div class="col-6">
+              <label class="cp-label">Last Name</label>
+              <input type="text" class="cp-field" id="rLast" placeholder="Name"/>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="cp-label">Email Address</label>
+            <input type="email" class="cp-field" id="rEmail" placeholder="you@example.com"/>
+          </div>
+          <div class="mb-3">
+            <label class="cp-label">Password</label>
+            <div class="input-group">
+              <input type="password" class="cp-field" id="rPwd" placeholder="Min. 8 characters" style="border-radius:12px 0 0 12px!important" oninput="checkStr()"/>
+              <button class="btn eye-btn" onclick="togglePwd('rPwd',this)"><i class="bi bi-eye"></i></button>
+            </div>
+            <div class="str-bar mt-2"><div class="str-fill" id="strFill"></div></div>
+            <small id="strTxt" style="font-size:.72rem;transition:color .3s"></small>
+          </div>
+          <div class="mb-3">
+            <label class="cp-label">I am a</label>
+            <div class="role-pick">
+              <div class="role-opt sel" id="roUser" onclick="selRole('user')">
+                <i class="bi bi-person-fill"></i><span>Client</span>
+              </div>
+              <div class="role-opt" id="roExp" onclick="selRole('expert')">
+                <i class="bi bi-award-fill"></i><span>Expert</span>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3 form-check">
+            <input class="form-check-input" type="checkbox" id="agr"/>
+            <label class="form-check-label" style="font-size:.82rem;color:var(--ink2)" for="agr">
+              I agree to the <a href="#" style="color:var(--gold);text-decoration:none">Terms & Privacy Policy</a>
+            </label>
+          </div>
+          <div id="rErr" class="alert alert-danger py-2 d-none" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:10px;font-size:.82rem"></div>
+          <button class="btn btn-gold w-100 py-3" onclick="handleRegister()">Create My Account</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero-section" id="home">
+  <div class="container position-relative" style="z-index:2">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <div class="hero-eyebrow">Trusted by 50,000+ users worldwide</div>
+        <h1 class="hero-title">
+          Expert Advice,<br>
+          <span class="italic-gold">Instantly</span>
+          <span class="outline-txt"> Available</span>
+        </h1>
+        <p class="hero-sub">Connect with verified world-class professionals in Law, Finance, Health & Technology — right from your device, on your schedule.</p>
+        <div class="hero-actions">
+          <button class="btn btn-gold" onclick="showAuth('register')">Book a Consultation</button>
+          <button class="btn btn-outline-gold" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">
+            <i class="bi bi-play-circle me-2"></i>See How It Works
+          </button>
+        </div>
+        <div class="hero-divider"></div>
+        <div class="hero-stats-row">
+          <div class="hero-stat"><strong>500+</strong><span>Verified Experts</span></div>
+          <div class="hero-stat"><strong>98%</strong><span>Satisfaction</span></div>
+          <div class="hero-stat"><strong>24/7</strong><span>Availability</span></div>
+          <div class="hero-stat"><strong>4.9★</strong><span>Platform Rating</span></div>
+        </div>
+      </div>
+      <div class="col-lg-6 d-none d-lg-block">
+        <div class="hero-visual">
+          <div class="float-card fc-a">
+            <img src="https://i.pravatar.cc/48?img=12" alt=""/>
+            <div><strong>Dr. Sarah Chen</strong><small>Health Consultant</small></div>
+            <div class="pulse-dot ms-2"></div>
+          </div>
+          <div class="float-card fc-b">
+            <img src="https://i.pravatar.cc/48?img=33" alt=""/>
+            <div><strong>James Miller</strong><small>Financial Advisor</small></div>
+            <div class="pulse-dot ms-2"></div>
+          </div>
+          <div class="float-card fc-c">
+            <i class="bi bi-calendar-check-fill"></i>
+            <div><strong>Next Slot</strong><small>Today, 3:00 PM</small></div>
+          </div>
+          <div class="hero-portrait">
+            <img src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=600&q=85" alt="consultation"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ MARQUEE ══════════ -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <div class="marquee-item"><span class="dot">✦</span> Financial Planning</div>
+    <div class="marquee-item"><span class="dot">✦</span> Legal Counsel</div>
+    <div class="marquee-item"><span class="dot">✦</span> Health & Wellness</div>
+    <div class="marquee-item"><span class="dot">✦</span> Technology Strategy</div>
+    <div class="marquee-item"><span class="dot">✦</span> Business Growth</div>
+    <div class="marquee-item"><span class="dot">✦</span> Mental Health</div>
+    <div class="marquee-item"><span class="dot">✦</span> Tax Advisory</div>
+    <div class="marquee-item"><span class="dot">✦</span> Cybersecurity</div>
+    <!-- duplicate for seamless loop -->
+    <div class="marquee-item"><span class="dot">✦</span> Financial Planning</div>
+    <div class="marquee-item"><span class="dot">✦</span> Legal Counsel</div>
+    <div class="marquee-item"><span class="dot">✦</span> Health & Wellness</div>
+    <div class="marquee-item"><span class="dot">✦</span> Technology Strategy</div>
+    <div class="marquee-item"><span class="dot">✦</span> Business Growth</div>
+    <div class="marquee-item"><span class="dot">✦</span> Mental Health</div>
+    <div class="marquee-item"><span class="dot">✦</span> Tax Advisory</div>
+    <div class="marquee-item"><span class="dot">✦</span> Cybersecurity</div>
+  </div>
+</div>
+
+<!-- ══════════ HOW IT WORKS ══════════ -->
+<section class="how-section" id="how">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <div class="section-eyebrow">Simple Process</div>
+      <h2 class="section-title">Three Steps to Expert Advice</h2>
+      <p class="section-sub mx-auto">From discovery to deep consultation in minutes, not days.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4 reveal reveal-d1">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-icon-wrap"><i class="bi bi-search-heart"></i></div>
+          <h5>Discover Your Expert</h5>
+          <p>Browse 500+ verified professionals filtered by specialty, rating, language, and real-time availability.</p>
+        </div>
+      </div>
+      <div class="col-md-4 reveal reveal-d2">
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-icon-wrap"><i class="bi bi-calendar2-check"></i></div>
+          <h5>Schedule a Session</h5>
+          <p>Pick your preferred time slot and consultation format — video, voice, or chat. Instant confirmation.</p>
+        </div>
+      </div>
+      <div class="col-md-4 reveal reveal-d3">
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-icon-wrap"><i class="bi bi-shield-check"></i></div>
+          <h5>Consult & Transform</h5>
+          <p>Meet via encrypted video call. Get personalized, actionable advice with follow-up support included.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ EXPERTS ══════════ -->
+<section class="experts-section" id="experts">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <div class="section-eyebrow">Our Professionals</div>
+      <h2 class="section-title">Meet the Experts</h2>
+      <p class="section-sub mx-auto">Every expert is rigorously vetted, background-checked, and rated by real clients.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap justify-content-center mb-4 reveal" id="filterRow">
+      <button class="filter-pill active" onclick="filterExp('all',this)">All Experts</button>
+      <button class="filter-pill" onclick="filterExp('health',this)">Health</button>
+      <button class="filter-pill" onclick="filterExp('finance',this)">Finance</button>
+      <button class="filter-pill" onclick="filterExp('legal',this)">Legal</button>
+      <button class="filter-pill" onclick="filterExp('tech',this)">Technology</button>
+      <button class="filter-pill" onclick="filterExp('business',this)">Business</button>
+    </div>
+    <div class="row g-4" id="expertsGrid"></div>
+    <div class="text-center mt-5 reveal">
+      <button class="btn btn-outline-gold" onclick="showAuth('register')">Explore All Experts <i class="bi bi-arrow-right ms-1"></i></button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ TESTIMONIALS ══════════ -->
+<section class="testimonials-section" id="reviews">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <div class="section-eyebrow">Client Stories</div>
+      <h2 class="section-title">What Our Clients Say</h2>
+    </div>
+    <div class="row g-4" id="testiGrid"></div>
+  </div>
+</section>
+
+<!-- ══════════ PRICING ══════════ -->
+<section class="pricing-section" id="pricing">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <div class="section-eyebrow">Plans & Pricing</div>
+      <h2 class="section-title">Invest in Expert Guidance</h2>
+      <p class="section-sub mx-auto">Transparent pricing. No hidden fees. Cancel anytime.</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4 reveal reveal-d1">
+        <div class="price-card">
+          <div class="plan-label">Starter</div>
+          <div class="plan-amount">Free</div>
+          <div class="plan-period">Forever free, no credit card</div>
+          <ul class="plan-features">
+            <li><i class="bi bi-check-circle-fill"></i> 1 Free Session / month</li>
+            <li><i class="bi bi-check-circle-fill"></i> Chat Consultations</li>
+            <li><i class="bi bi-check-circle-fill"></i> Expert Directory</li>
+            <li class="off"><i class="bi bi-x-circle-fill"></i> Video Calls</li>
+            <li class="off"><i class="bi bi-x-circle-fill"></i> Priority Booking</li>
+            <li class="off"><i class="bi bi-x-circle-fill"></i> Session Recordings</li>
+          </ul>
+          <button class="btn btn-outline-gold w-100" onclick="showAuth('register')">Start Free</button>
+        </div>
+      </div>
+      <div class="col-md-4 reveal reveal-d2">
+        <div class="price-card featured">
+          <div class="plan-ribbon">Most Popular</div>
+          <div class="plan-label">Professional</div>
+          <div class="plan-amount"><span class="cur">₹</span>999<span class="per">/mo</span></div>
+          <div class="plan-period">Billed monthly · 7-day free trial</div>
+          <ul class="plan-features">
+            <li><i class="bi bi-check-circle-fill"></i> 10 Sessions / month</li>
+            <li><i class="bi bi-check-circle-fill"></i> Video + Chat + Voice</li>
+            <li><i class="bi bi-check-circle-fill"></i> Priority Booking</li>
+            <li><i class="bi bi-check-circle-fill"></i> HD Session Recordings</li>
+            <li><i class="bi bi-check-circle-fill"></i> Follow-up Messages</li>
+            <li><i class="bi bi-check-circle-fill"></i> Expert Notes & Reports</li>
+          </ul>
+          <button class="btn btn-gold w-100" onclick="showAuth('register')">Start 7-Day Trial</button>
+        </div>
+      </div>
+      <div class="col-md-4 reveal reveal-d3">
+        <div class="price-card">
+          <div class="plan-label">Enterprise</div>
+          <div class="plan-amount">Custom</div>
+          <div class="plan-period">For teams & organizations</div>
+          <ul class="plan-features">
+            <li><i class="bi bi-check-circle-fill"></i> Unlimited Sessions</li>
+            <li><i class="bi bi-check-circle-fill"></i> Dedicated Expert Team</li>
+            <li><i class="bi bi-check-circle-fill"></i> API Integration</li>
+            <li><i class="bi bi-check-circle-fill"></i> Analytics Dashboard</li>
+            <li><i class="bi bi-check-circle-fill"></i> White-label Option</li>
+            <li><i class="bi bi-check-circle-fill"></i> SLA & Support</li>
+          </ul>
+          <button class="btn btn-outline-gold w-100" onclick="showAuth('register')">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer class="footer" id="mainFooter">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <span class="footer-brand">Consult<span class="pro">Pro</span></span>
+        <p class="footer-desc">Connecting people with world-class experts for transformative consultations. Your trusted platform for professional advice.</p>
+        <div class="footer-soc">
+          <a href="#"><i class="bi bi-twitter-x"></i></a>
+          <a href="#"><i class="bi bi-linkedin"></i></a>
+          <a href="#"><i class="bi bi-instagram"></i></a>
+          <a href="#"><i class="bi bi-facebook"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-6">
+        <h6 class="foot-h">Platform</h6>
+        <ul class="foot-links">
+          <li><a href="#">Find Experts</a></li>
+          <li><a href="#">How It Works</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">Enterprise</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-6">
+        <h6 class="foot-h">Company</h6>
+        <ul class="foot-links">
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Press</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4">
+        <h6 class="foot-h">Newsletter</h6>
+        <p class="footer-desc">Expert tips, platform updates, and exclusive offers.</p>
+        <div class="nl-wrap">
+          <input type="email" class="nl-input" placeholder="Your email address"/>
+          <button class="btn btn-gold">Subscribe</button>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <p class="foot-copy">© 2025 ConsultPro. All rights reserved.</p>
+      <div class="d-flex gap-3">
+        <a href="#" class="foot-pol">Privacy Policy</a>
+        <a href="#" class="foot-pol">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════ DASHBOARD ══════════ -->
+<div id="dashboardPage" style="display:none">
+  <nav class="dash-nav">
+    <a class="navbar-brand" href="#" style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--ink);text-decoration:none">
+      Consult<span style="color:var(--gold);font-style:italic">Pro</span>
+    </a>
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn" style="background:var(--surface);border:1px solid var(--rim);color:var(--ink2);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;position:relative;cursor:none">
+        <i class="bi bi-bell" style="font-size:.9rem"></i>
+        <span style="position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--gold);border-radius:50%;border:2px solid var(--void)"></span>
+      </button>
+      <div class="nav-av" id="navAv">JD</div>
+      <button class="btn btn-sm btn-outline-gold" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </nav>
+  <div class="dash-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-lbl">Menu</div>
+      <ul style="list-style:none;padding:0;margin:0">
+        <li><div class="s-link active" id="sl-overview" onclick="dashSection('overview',this)"><i class="bi bi-grid-1x2"></i><span>Overview</span></div></li>
+        <li><div class="s-link" id="sl-experts" onclick="dashSection('experts',this)"><i class="bi bi-people"></i><span>Find Experts</span></div></li>
+        <li><div class="s-link" id="sl-bookings" onclick="dashSection('bookings',this)"><i class="bi bi-calendar3"></i><span>My Bookings</span><span class="s-badge">2</span></div></li>
+        <li><div class="s-link" id="sl-messages" onclick="dashSection('messages',this)"><i class="bi bi-chat-dots"></i><span>Messages</span><span class="s-badge">3</span></div></li>
+        <li><div class="s-link" id="sl-profile" onclick="dashSection('profile',this)"><i class="bi bi-person"></i><span>Profile</span></div></li>
+      </ul>
+      <div style="margin-top:auto;padding:24px;border-top:1px solid var(--rim)">
+        <div style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:14px;padding:16px;text-align:center">
+          <div style="font-size:.72rem;color:var(--gold);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Pro Plan</div>
+          <div style="font-size:.8rem;color:var(--ink2);margin-bottom:12px">8/10 sessions used</div>
+          <div style="height:4px;background:var(--rim);border-radius:2px;overflow:hidden;margin-bottom:12px">
+            <div style="width:80%;height:100%;background:linear-gradient(90deg,var(--gold-dk),var(--gold));border-radius:2px"></div>
+          </div>
+          <button class="btn btn-gold btn-sm w-100" style="font-size:.75rem">Upgrade Plan</button>
+        </div>
+      </div>
+    </aside>
+    <main class="dash-main" id="dashMain"></main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
